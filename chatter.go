@@ -20,7 +20,7 @@ func (c *Chatter) ReadMessages() {
 		if err != nil {
 			return
 		}
-		c.chatroom.forward <- message
+		c.chatroom.forwardMessages <- message
 	}
 }
 
