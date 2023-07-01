@@ -13,6 +13,7 @@ var (
 	upgrader = websocket.Upgrader{HandshakeTimeout: websocketBufferSize, ReadBufferSize: messagesBufferSize}
 )
 
+// ChatRoom implements all the operations possible in the ChatRoom.
 type ChatRoom struct {
 	// chatters are people chatting in the ChatRoom.
 	chatters map[*Chatter]bool
