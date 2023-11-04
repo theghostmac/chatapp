@@ -17,6 +17,12 @@ func main() {
 
 	log.Printf("Listening to TCP connections on Port: %s ...\n", PORT)
 
+	// outgoing channel
+	outgoing := make(chan string)
+
+	// spawn a goroutine to print data from the outgoing channel
+	go printOutgoingData(outgoing)
+
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
@@ -25,7 +31,14 @@ func main() {
 
 		log.Printf("Accepted connection from: %s\n", safeRemoteAddr(conn))
 
-		go handleConnection(conn)
+		// spawn a new goroutine to handle the connection
+		go handleConnection(conn, outgoing)
+	}
+}
+
+func printOutgoingData(outgoing chan string) {
+	for data := range outgoing {
+		fmt.Printf("Outgoing data: %s\n", data)
 	}
 }
 
@@ -37,7 +50,7 @@ func safeRemoteAddr(conn net.Conn) string {
 	}
 }
 
-func handleConnection(conn net.Conn) {
+func handleConnection(conn net.Conn, outgoing chan string) {
 	defer conn.Close()
 	buffer := make([]byte, 1024)
 
@@ -51,8 +64,7 @@ func handleConnection(conn net.Conn) {
 		data := string(buffer[:n])
 		fmt.Printf("Received data from %s: %s\n", safeRemoteAddr(conn), data)
 
-		// You can process the data here or send it to an outgoing channel.
-		// For example, if you have an outgoing channel, you can do:
-		// outgoing <- data
+		// send the received data to the outgoing channel.
+		outgoing <- data
 	}
 }
